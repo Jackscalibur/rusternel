@@ -30,19 +30,22 @@ fn read_uptime() -> io::Result<Duration> {
     let seconds = contents.split_whitespace().next()
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "Failed to read uptime"))?
         .parse::<f64>()
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid uptime format"))?;
     Ok(Duration::from_secs_f64(seconds))
 }
 
 fn read_load_average() -> io::Result<(f64, f64, f64)> {
     let contents = fs::read_to_string("/proc/loadavg")?;
-    let parts: Vec<&str> = contents.split_whitepspace().collect();
+    let parts: Vec<&str> = contents.split_whitespace().collect();
     if parts.len() < 3 {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid load average format"));
     }
 
-    let one = parts[0].parse::<f64>()?;
-    let five = parts[1].parse::<f64>()?;
-    let fifteen = parts[2].parse::<f64>()?;
+    let one = parts[0].parse::<f64>()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+    let five = parts[1].parse::<f64>()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+    let fifteen = parts[2].parse::<f64>()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
     Ok((one, five, fifteen))
 }

@@ -27,3 +27,7 @@ fn filter_processes(processes: Vec<String>, filter: &str) -> Vec<String> {
 
 // Maybe create a function to send signals to processes?
 // A tree view of processes would be cool too, but requires more work
+pub fn get_filtered_processes(filter: &str) -> Result<Vec<String>, io::Error> {
+    let processes = list_running_processes()?;
+    Ok(filter_processes(processes, filter))
+}

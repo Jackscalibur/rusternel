@@ -13,7 +13,10 @@ fn format_duration(d: Duration) -> String {
 }
 
 fn main() {
-    let info = SysInfo::gather()?;
+    let info = SysInfo::gather().unwrap();
 
-    // Print the gathered system information
+    // Dummy data for demonstration and brainstorming
+    println!("Kernel Version: {}", info.kernel_version);
+    println!("Uptime: {}", format_duration(info.uptime));
+    println!("Load Average: {:?}", info.load_average);
 }
