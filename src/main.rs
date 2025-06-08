@@ -1,22 +1,26 @@
 mod modules;
-use modules::sysinfo::SysInfo;
-use std::time::Duration;
+use std::io::{self, stdout};
+use ratatui::{backend::CrosstermBackend, Terminal};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::execute;
 
-// Useful for printing durations in a human-readable format
-fn format_duration(d: Duration) -> String {
-    let secs = d.as_secs();
-    let mins = secs / 60;
-    let hours = mins / 60;
-    let days = hours / 24;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Setup terminal
+    enable_raw_mode()?;
+    let mut stdout = stdout();
+    execute!(stdout, EnterAlternateScreen)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
 
-    format!("{}d {}h {}m {}s", days, hours % 24, mins % 60, secs % 60)
-}
+    // TUI rendering loop
+    terminal.draw(|f| {
+        // Here you would call your rendering functions, e.g.:
+        // modules::sysinfo::render(f);
+        f.render_widget(ratatui::widgets::Block::default().title("System Information").borders(ratatui::widgets::Borders::ALL), f.size());
+    })?;
 
-fn main() {
-    let info = SysInfo::gather().unwrap();
-
-    // Dummy data for demonstration and brainstorming
-    println!("Kernel Version: {}", info.kernel_version);
-    println!("Uptime: {}", format_duration(info.uptime));
-    println!("Load Average: {:?}", info.load_average);
+    // Cleanup
+    disable_raw_mode()?;
+    execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+    Ok(())
 }
