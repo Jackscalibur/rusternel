@@ -1,26 +1,24 @@
-mod modules;
-use std::io::{self, stdout};
-use ratatui::{backend::CrosstermBackend, Terminal};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, EnterAlternateScreen, LeaveAlternateScreen};
-use crossterm::execute;
+use color_eyre::Result;
+use crossterm::event::{self, Event};
+use ratatui::{DefaultTerminal, Frame};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Setup terminal
-    enable_raw_mode()?;
-    let mut stdout = stdout();
-    execute!(stdout, EnterAlternateScreen)?;
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+fn main() -> Result<()> {
+    color_eyre::install()?;
+    let terminal = ratatui::init();
+    let result = run(terminal);
+    ratatui::restore();
+    result
+}
 
-    // TUI rendering loop
-    terminal.draw(|f| {
-        // Here you would call your rendering functions, e.g.:
-        // modules::sysinfo::render(f);
-        f.render_widget(ratatui::widgets::Block::default().title("System Information").borders(ratatui::widgets::Borders::ALL), f.size());
-    })?;
+fn run(mut terminal: DefaultTerminal) -> Result<()> {
+    loop {
+        terminal.draw(render)?;
+        if matches!(event::read()?, Event::Key(_)) {
+            break Ok(());
+        }
+    }
+}
 
-    // Cleanup
-    disable_raw_mode()?;
-    execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
-    Ok(())
+fn render(frame: &mut Frame) {
+    frame.render_widget("hello world", frame.area());
 }
