@@ -1,4 +1,4 @@
 pub mod sysinfo;
-pub mod modules;
+pub mod processes;
 pub mod cpu;
 pub mod utils;

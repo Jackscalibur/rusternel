@@ -6,7 +6,7 @@ use ratatui::{
     widgets::{Block, Paragraph, Widget},
 };
 
-struct SystemInfo {
+pub struct SystemInfo {
     os_version: String,
     cpu_info: String,
     memory_info: String,
@@ -52,5 +52,9 @@ impl SystemInfo {
         Paragraph::new(text)
             .block(paragraph_block)
             .render(area, buf);
+    }
+
+    pub fn get_os_version(&self) -> &str {
+        &self.os_version
     }
 }
